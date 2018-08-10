@@ -25,8 +25,8 @@ using namespace cv;
 using namespace finitediff;
 using namespace concurrency;
 
-const bool GENERATE_AHO = false;	//true = generate the focus volume from images | false = use pre-generated
-const bool DO_AGGRIGATION = false;
+const bool GENERATE_AHO = true;	//true = generate the focus volume from images | false = use pre-generated
+const bool DO_AGGRIGATION = true;
 
 cv::Point2i pt(-1, -1); //define a point for use in mouse selection
 
