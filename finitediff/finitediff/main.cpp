@@ -31,23 +31,24 @@ const bool DO_AGGRIGATION = true;
 cv::Point2i pt(-1, -1); //define a point for use in mouse selection
 
 //data set information
-const float z_step = 0.01;				//the step between each image
+const float z_step = 0.1;				//the step between each image
 const float pixel_width_mm = 0.004;
 const float pixel_height_mm = 0.004;
 
 //hyperparameters
-float decay_rate = 0.6;			//6 specified in paper
-int max_derivative_order = 5;	//number of derivatives to run
+float decay_rate = 6;			//6 specified in paper
+int max_derivative_order = 2;	//number of derivatives to run
 int kernel_size = 3;			//must be odd and greater than derivative order
 int agg_iterations = 6;			//aggrigation iterations
 int agg_filter_size = 5;		//filter size used in aggrigation
 float rec_threshold = 0.7;		//threshold used in reconstruction. Defines what fraction of points are to be considered. 
-float rec_alpha_threshold = 0;	//only add values with this confidence to depthmap
+float rec_alpha_threshold = 0.9;	//only add values with this confidence to depthmap
 
 //open all the images
-//String folderpath = "C:/Users/jacobge/Desktop/GNU Octave/defocus/simu01/*.tif";
-String folderpath = "C:/Users/jacobge/Desktop/GNU Octave/sff/iview scan/*.bmp";
+String folderpath = "C:/git_repos/iView/simu02/*.tif";
+//String folderpath = "C:/Users/jacobge/Desktop/GNU Octave/sff/iview scan/*.bmp";
 //String folderpath = "C:/Users/jacobge/Desktop/GNU Octave/sff/Alicona aligned/*.jpg";
+//string folderpath = "C:/Users/jacobge/Desktop/Alicona/*.bmp";
 
 //some global variables to be used by mouse click curve inspection
 vector<Mat> AHO;	// adaptive higher order focus volume
@@ -261,7 +262,7 @@ void reconstruction(vector<Mat> AHO, vector<Mat> input_image_stack, vector<float
 
 			}
 			else{
-				depthmap.at<float>(pixel_row, pixel_col) = NAN;
+				depthmap.at<float>(pixel_row, pixel_col) = NAN;	//set to NAN so these pixels aren't displayed 
 				colormap.at<unsigned char>(pixel_row, pixel_col) = NAN;
 			}
 
@@ -400,7 +401,7 @@ void main(){
 							float pixel = AHO[image_no].at<float>(pixel_row, pixel_col) + alpha*fm_vec_norm[image_no];
 							AHO_working[image_no].at<float>(pixel_row, pixel_col) = pixel;
 							if (isnan(pixel)) {
-								cout << "NAN " << pixel_row << " " << pixel_col << endl;
+								cout << "pixel " << pixel_row << " " << pixel_col << " focus measure was NAN. Image # " << image_no << "\n" << endl;
 							}
 
 							//cout << "added " << alpha*fm_vector_norm[image_no] << " to pixel = " << pixel_row << " " << pixel_col << " image_no " << image_no << " pixel now = " << AHO[image_no].at<float>(pixel_row, pixel_col) << endl;
@@ -482,6 +483,7 @@ void main(){
 		fs1 << "AHO" << AHO;
 		//fs1 << "alpha_mat" << alpha_mat;
 		fs1.release();
+		AHO_working.clear();
 	}
 
 	else if (DO_AGGRIGATION){
@@ -596,11 +598,12 @@ void main(){
 		fs3.release();
 	}
 
-	else{ //if we haven't run the filtering read the data from disk
-		string AHO_filename = "aggrigation_result.yml";
-		FileStorage fs2(AHO_filename, FileStorage::READ);
-		fs2["AHO"] >> AHO;
-	}
+	//else{ //if we haven't run the filtering read the data from disk	
+	////TODO: this should be if we havent run aggrigation just use the pre aggrigation AHO
+	//	string AHO_filename = "aggrigation_result.yml";
+	//	FileStorage fs2(AHO_filename, FileStorage::READ);
+	//	fs2["AHO"] >> AHO;
+	//}
 
 	//do the reconstruction
 	reconstruction(AHO, input_image_stack, z_pos_vector, depthmap, colormap);
