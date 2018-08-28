@@ -31,7 +31,7 @@ void viz_plot::vizPlot3D(const Mat depthmap, const Mat colormap, const float pix
 	}
 
 	// Create cv::Mat from Coordinate Buffer
-	Mat cloudMat = cv::Mat(Height, Width, CV_32FC3, &buffer[0]).clone();
+	Mat cloudMat = cv::Mat(Height, Width, CV_32FC3, &buffer[0]);
 
 
 	viz::WCloud cloud(cloudMat, colormap);
